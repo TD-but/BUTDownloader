@@ -1,0 +1,57 @@
+query getFinance {
+  financeEntries: entries(section: "finance", site: "cop26") {
+    ...entry
+  }
+  partners: categories(group: "partners") {
+    ... on partners_Category {      
+      id:uniqueId
+      logo {
+        id
+        dateModified
+        kind
+        extension
+        url
+      }
+    }
+  }
+}
+
+fragment entry on finance_finance_Entry {
+  id
+  title
+  orientation
+  body: pages {
+    ... on pages_page_BlockType {
+      text: body
+    }
+  }
+  country: location {
+    ... on locations_Category {
+      id: uniqueId
+      name: title
+    }
+  }
+  tech: energytype {
+    ... on energytypes_Category {
+      id: uniqueId
+      name: title
+    }
+  }
+  partners {
+    ... on partners_Category {
+      id: uniqueId
+      name: title
+    }
+  }
+  assets {
+    ...asset
+  }
+}
+
+fragment asset on cop26_Asset {
+  id
+  dateModified
+  kind
+  extension
+  url
+}
