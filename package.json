@@ -20,6 +20,11 @@
       "displayName": "Single Query",
       "description": "Sample showing the setup for how to download Json and Assets for a single GraphQL Query.",
       "path": "Samples~/01_SingleQuery"
+    },
+    {
+      "displayName": "Multiple Query",
+      "description": "Complex setup showcasing how to download Json and Assets seperately using multiple GarphQL Queries",
+      "path": "Samples~/02_MultipleQuery"
     }
   ]
 }
