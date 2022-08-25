@@ -1,0 +1,43 @@
+query getContentCatalouge {
+  contentFolders: entries(section: "contentcatalouge") {
+    ... on contentcatalouge_default_Entry {
+      id
+      title
+      contentList:contentlist {
+        ... on presentationcontent_Asset {
+          id
+          thumbnailIds: thumbnail {
+            id
+          }
+        }
+      }
+    }
+  }
+  assetList: assets(volume: ["presentationcontent"]) {
+    ...assetFields
+    ... on presentationcontent_Asset {
+      thumbnail {
+        ...assetThumbnail
+      }
+    }
+  }
+}
+
+fragment assetFields on AssetInterface {
+  id
+  extension
+  kind
+  title
+  url
+  imageThumbURL: url(transform: "thumb")
+  dateModified
+}
+
+fragment assetThumbnail on AssetInterface {
+  id
+  extension
+  kind
+  title
+  url(transform: "thumb")
+  dateModified
+}

@@ -12,6 +12,8 @@ namespace BUT.Downloader
             DisplayQuerySettings(settings);
             EditorGUILayout.Space(20);
             DisplayAssetSettings(settings);
+            
+            EditorUtility.SetDirty(settings);
         }
 
         private void DisplayQuerySettings(DownloaderSettings settings)
@@ -87,6 +89,13 @@ namespace BUT.Downloader
                         new GUIContent("Videos Directory",
                             "Path to Directory relative to Streaming Assets where videos will be saved"),
                         settings.videosFileDir);
+                
+                settings.downloadBinary = EditorGUILayout.Toggle("Download Binary", settings.downloadBinary);
+                if (settings.downloadBinary)
+                    settings.binaryFileDir = EditorGUILayout.TextField(
+                        new GUIContent("Binary Files Directory",
+                            "Path to Directory relative to Streaming Assets where binary files will be saved"),
+                        settings.binaryFileDir);
             }
 
             EditorGUILayout.EndVertical();

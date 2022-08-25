@@ -59,7 +59,7 @@ namespace BUT
             }
         }
 
-        public static bool CheckResultForErrors(UnityWebRequest request)
+        private static bool CheckResultForErrors(UnityWebRequest request)
         {
             return request.result == UnityWebRequest.Result.ConnectionError ||
                    request.result == UnityWebRequest.Result.ProtocolError ||

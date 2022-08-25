@@ -7,8 +7,6 @@ namespace BUT.Downloader
     [CanEditMultipleObjects]
     public class DownloaderEditor : Editor
     {
-        private bool _onInitial = true;
-        
         public override void OnInspectorGUI()
         {
             var _downloader = (Downloader)target;
@@ -28,7 +26,6 @@ namespace BUT.Downloader
 
 
             // Handle Json Data Reference
-            if (_onInitial) { _downloader.debugMode = false; _onInitial = false; }
             var btnTitle = _downloader.debugMode ? "Disable Debug Mode" : "Enable Debug Mode";
             if (GUILayout.Button(btnTitle)) _downloader.ToggleDebug();
         }

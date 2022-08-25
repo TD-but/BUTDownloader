@@ -38,7 +38,7 @@ namespace BUT.Downloader
                     }
 
                     // read results:
-                    if (Http.CheckResultForErrors(www))
+                    if (www.isNetworkError || www.isHttpError)
                     {
                         Debug.Log("<color=red>" + www.error + "  \n" + imageUrl + "</color>");
                         return; //EXIT if error
@@ -50,7 +50,7 @@ namespace BUT.Downloader
                     var imgTask = Task.Run(() => { SaveImageAsync(saveDir, imgData); }, cToken);
                     await imgTask;
                 }
-            }catch(Exception e) { Debug.Log("<color=red> IMAGE DOWNLOAD CANCELLED: </color>" + imageUrl + "\n" + e); }
+            }catch(Exception e) { Debug.Log("<color=red> IMAGE DOWNLOAD CANCELLED: </color>" + imageUrl); }
         }
         
         public async Task DownloadImage(string imageUrl, string dir, CancellationToken cToken, Action onComplete)
@@ -74,7 +74,7 @@ namespace BUT.Downloader
                     }
 
                     // read results:
-                    if (Http.CheckResultForErrors(www))
+                    if (www.isNetworkError || www.isHttpError)
                     {
                         Debug.Log("<color=red>" + www.error + "  \n" + imageUrl + "</color>");
                         return; //EXIT if error
@@ -87,7 +87,7 @@ namespace BUT.Downloader
                     await imgTask;
                     onComplete?.Invoke();
                 }
-            }catch(Exception e) { Debug.Log("<color=red> IMAGE DOWNLOAD CANCELLED: </color>" + imageUrl + "\n" + e); }
+            }catch(Exception e) { Debug.Log("<color=red> IMAGE DOWNLOAD CANCELLED: </color>" + imageUrl); }
         }
 
         //Saves image byte array to path provided
@@ -139,7 +139,7 @@ namespace BUT.Downloader
                     }
 
                     // read results:
-                    if(Http.CheckResultForErrors(www))
+                    if( www.isNetworkError || www.isHttpError )
                     {
                         // log error:
                         Debug.Log( $"<color=red> GET LOCAL TEXTURE FAILED: </color> {www.error}, URL:{www.url}" );
@@ -174,7 +174,7 @@ namespace BUT.Downloader
                     }
 
                     // read results:
-                    if(Http.CheckResultForErrors(www))
+                    if( www.isNetworkError || www.isHttpError )
                     {
                         // log error:
                         Debug.Log( $"<color=red> GET LOCAL TEXTURE FAILED: </color> {www.error}, URL:{www.url}" );
@@ -188,7 +188,7 @@ namespace BUT.Downloader
                 }
             } catch(Exception e) 
             { 
-                Debug.Log("<color=red> IMAGE LOAD TO SPRITE CANCELLED: </color>" + filePath + "\n" + e);
+                Debug.Log("<color=red> IMAGE LOAD TO SPRITE CANCELLED: </color>" + filePath);
                 return null;
             }
         }

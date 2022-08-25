@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 394c84dd68465ab4dba67d1266a11f21, type: 3}
+  m_Name: MAF Partner Settings
+  m_EditorClassIdentifier: 
+  downloadJson: 1
+  downloadJsonOnStart: 0
+  apiURL: https://mafcenter.devae1.buthost.com/api
+  authorizationCode: UgouS1JIO6r_U3fl8OLAs2xYj5b4FN7J
+  jsonFilePath: /partnerData.json
+  query: {fileID: 4900000, guid: 0aaeb22dacdea294bbd7c73b407bee4d, type: 3}
+  jsonDataObj: {fileID: 11400000, guid: 8d89ddd7dae5dec4aa4e2c76c8f0fef1, type: 2}
+  downloadAssets: 1
+  assetURL: https://mafcenter.devae1.buthost.com
+  downloadImages: 1
+  imagesFileDir: MAFeedAssets
+  downloadVideos: 1
+  videosFileDir: MAFeedAssets
+  downloadBinary: 1
+  binaryFileDir: MAFeedAssets

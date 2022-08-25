@@ -37,7 +37,7 @@ namespace BUT.Downloader
                     }
 
                     // read results:
-                    if (Http.CheckResultForErrors(www))
+                    if (www.isNetworkError || www.isHttpError)
                     {
                         Debug.Log("<color=red>" + www.error + "  \n" + videoUrl + "</color>");
                         return; //EXIT if error
@@ -49,13 +49,13 @@ namespace BUT.Downloader
                     var vidTask = Task.Run(() => { SaveVideoAsync(saveDir, vidData); }, cToken);
                     await vidTask;
                 }
-            }catch(Exception e) { Debug.Log("<color=red> VIDEO DOWNLOAD CANCELLED: </color>" + videoUrl + "\n" + e); }
+            }catch(Exception e) { Debug.Log("<color=red> VIDEO DOWNLOAD CANCELLED: </color>" + videoUrl); }
         }
         
-        public async Task DownloadVideo(string videoUrl, string dir, CancellationToken cToken, Action onComplete)
+        public async Task DownloadVideo(string videoUrl, string filePath, CancellationToken cToken, Action onComplete)
         {
             string videoName = videoUrl.Substring(videoUrl.LastIndexOf('/') + 1);
-            string saveDir = Path.Combine(dir, videoName);
+            // string saveDir = Path.Combine(dir, videoName);
             
             if (_debugMode) Debug.Log("<color=yellow> Called Download Video With: </color>" + videoUrl);
             
@@ -72,7 +72,7 @@ namespace BUT.Downloader
                     }
 
                     // read results:
-                    if (Http.CheckResultForErrors(www))
+                    if (www.isNetworkError || www.isHttpError)
                     {
                         Debug.Log("<color=red>" + www.error + "  \n" + videoUrl + "</color>");
                         return; //EXIT if error
@@ -81,12 +81,14 @@ namespace BUT.Downloader
                     // return valid results:
                     if (_debugMode) Debug.Log("<color=green> Successfully downloaded Video: </color>" + videoName);
                     byte[] vidData = www.downloadHandler.data;
-                    var vidTask = Task.Run(() => { SaveVideoAsync(saveDir, vidData); }, cToken);
+                    var vidTask = Task.Run(() => { SaveVideoAsync(filePath, vidData); }, cToken);
                     await vidTask;
                     onComplete?.Invoke();
                 }
-            }catch(Exception e) { Debug.Log("<color=red> VIDEO DOWNLOAD CANCELLED: </color>" + videoUrl + "\n" + e); }
+            }catch(Exception e) { Debug.Log("<color=red> VIDEO DOWNLOAD CANCELLED: </color>" + videoUrl); }
         }
+        
+        
 
         //Saves video byte array to path provided
         public void SaveVideo(string path, byte[] vid)

@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 
 namespace BUT.Downloader
 {
+    [Serializable]
     [CreateAssetMenu(fileName = "Downloader Settings", menuName = "Downloader/Create Downloader Settings", order = 0)]
     public class DownloaderSettings : ScriptableObject
     {
@@ -20,5 +22,7 @@ namespace BUT.Downloader
         public string imagesFileDir;
         public bool   downloadVideos;
         public string videosFileDir;
+        public bool   downloadBinary;
+        public string binaryFileDir;
     }
 }

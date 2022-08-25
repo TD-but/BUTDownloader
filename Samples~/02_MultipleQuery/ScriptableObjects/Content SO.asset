@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d018ff572aa77f4ca611cf5cd8eb123, type: 3}
+  m_Name: Content SO
+  m_EditorClassIdentifier: 
+  data:
+    contentFolders:
+    - id: 23
+      title: MAF Content
+      contentList:
+      - id: 34
+        thumbnailIds: []
+      - id: 33
+        thumbnailIds:
+        - id: 34
+    assetList:
+    - extension: png
+      url: /assets/uploads/presentations/sample.png
+      localPath: 
+      id: 34
+      kind: image
+      title: Sample
+      imageThumbURL: /assets/uploads/presentations/_thumb/34/sample.jpg
+      thumbnailID: -34
+      thumbnail: []
+    - extension: pdf
+      url: /assets/uploads/presentations/MAF-innovation-centre-Content-V5.pdf
+      localPath: 
+      id: 33
+      kind: pdf
+      title: MAF innovation centre Content V5
+      imageThumbURL: /assets/uploads/presentations/MAF-innovation-centre-Content-V5.pdf
+      thumbnailID: 0
+      thumbnail:
+      - extension: png
+        url: /assets/uploads/presentations/_thumb/34/sample.jpg
+        localPath: 
+        id: 34
+        kind: image
+        title: Sample
+  _assets:
+  - extension: png
+    url: /assets/uploads/presentations/sample.png
+    localPath: 
+    id: 34
+    kind: image
+    title: Sample
+  - extension: png
+    url: /assets/uploads/presentations/_thumb/34/sample.jpg
+    localPath: 
+    id: -34
+    kind: image
+    title: Sample
+  - extension: pdf
+    url: /assets/uploads/presentations/MAF-innovation-centre-Content-V5.pdf
+    localPath: 
+    id: 33
+    kind: pdf
+    title: MAF innovation centre Content V5

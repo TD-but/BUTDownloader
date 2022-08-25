@@ -1,0 +1,46 @@
+query getPartnersAndNews {
+  partners: entries(section: "partnerfeed") {
+    ... on partnerfeed_default_Entry {
+      id
+      name: partnername
+      logo {
+        id
+        # dateUpdated
+        # url
+        # extension
+      }
+      writeup
+      media:partnermedia {
+        id
+        # dateUpdated
+        # url
+        # extension
+      }
+    }
+  }
+  news: entries(section: "newsfeed") {
+    ... on newsfeed_default_Entry {
+      id
+      headline
+      subheading
+      body
+      media:articlemedia {
+        id
+        # dateUpdated
+        # url
+        # extension
+      }
+    }
+  }
+  assetList: assets(volume: ["partners","news", "presentationcontent"],kind: ["image","video","pdf"]) {
+    ...assetFields
+  }
+}
+
+fragment assetFields on AssetInterface {
+  id
+  extension
+  title
+  url
+  dateModified
+}

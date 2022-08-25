@@ -9,13 +9,13 @@ using UnityEngine;
 
 namespace BUT.Downloader
 {
+    public enum FileType {Image, Video, Binary}
     public class Downloader : MonoBehaviour
     {
         
         #region Public Fields
 
         //------------------------------------------EVENTS---------------------------------------
-
         //Event invoked when json data has finished downloading
         public event Action OnJsonDownloadComplete;
 
@@ -55,6 +55,9 @@ namespace BUT.Downloader
 
         //The absolute path to the directory where videos will be saved 
         private string _vidDirPath;
+        
+        //The absolute path to the directory where binary files will be saved 
+        private string _binDirPath;
 
         //List to hold url of images to be downloaded 
         private List<AssetBase> _imagesToDownload;
@@ -154,6 +157,13 @@ namespace BUT.Downloader
                                    "</b> Video File Directory not provided </color>");
                     return false;
                 }
+                
+                if (settings.downloadBinary && settings.binaryFileDir == "")
+                {
+                    Debug.LogError("<color=red><b> Downloader:" + name +
+                                   "</b> Binary File Directory not provided </color>");
+                    return false;
+                }
             }
 
             return true;
@@ -163,7 +173,7 @@ namespace BUT.Downloader
         private void VerifyFiles()
         {
             //Check if json file on disk exists or create it  
-            if (!File.Exists(_dataFilePath))
+            if (settings.downloadJson && !File.Exists(_dataFilePath))
             {
                 if (_dataFilePath.Contains("/"))
                 {
@@ -183,6 +193,10 @@ namespace BUT.Downloader
             //Check if the video directory has been create else create it 
             if (settings.downloadVideos && !Directory.Exists(_vidDirPath))
                 Directory.CreateDirectory(_vidDirPath);
+            
+            //Check if the binary directory has been create else create it 
+            if (settings.downloadBinary && !Directory.Exists(_binDirPath))
+                Directory.CreateDirectory(_binDirPath);
         }
 
         //Initializes all variables 
@@ -215,6 +229,12 @@ namespace BUT.Downloader
                 SetFilePath(settings.videosFileDir, out _vidDirPath);
                 if (debugMode) Debug.Log("<color=yellow> Video File Path </color>" + _vidDirPath);
             }
+            
+            if (settings.downloadBinary)
+            {
+                SetFilePath(settings.binaryFileDir, out _binDirPath);
+                if (debugMode) Debug.Log("<color=yellow> Binary File Path </color>" + _binDirPath);
+            }
         }
 
         #endregion
@@ -223,15 +243,17 @@ namespace BUT.Downloader
 
         private void Awake()
         {
-            //verify are references are set properly 
+            //verify if references are set properly 
             if (!VerifyReferences())
             {
                 gameObject.SetActive(false);
                 return;
             }
 
+            // Initialize variables
             Init();
 
+            // Verify if filepaths and folders are set properly
             VerifyFiles();
         }
 
@@ -311,74 +333,52 @@ namespace BUT.Downloader
         //Checks if assets doesnt exist on disk or has newer version
         private void CheckAssetForDownload(AssetBase asset)
         {
-            string imageName;
-            string vidName;
-            DateTime localDateUpdated;
+            var fileName = asset.url.Substring(asset.url.LastIndexOf('/') + 1);
+            var fileType = CheckIfImage(asset.extension) ? FileType.Image :
+                CheckIfVideo(asset.extension) ? FileType.Video : FileType.Binary;
             
-            if (CheckIfImage(asset.extension))
+            // var filePathBase = fileType == FileType.Image ? _imgDirPath : fileType == FileType.Video ? _vidDirPath
+            var filepath = GetFilePath(fileType, fileName);
+            if (File.Exists(filepath))
             {
-                imageName = asset.url.Substring(asset.url.LastIndexOf('/') + 1);
-                var filepath = Path.Combine(_imgDirPath, imageName);
-                if (debugMode)
-                    Debug.Log("<color=lightblue> <b>ASSET</b> IMAGE: " + imageName + " | Path: " + filepath +
-                              "</color>");
-
-                if (File.Exists(filepath))
+                var localDateUpdated = File.GetLastWriteTime(filepath);
+                if (debugMode) Debug.Log("<color=lightblue> <b>DATES</b> LocalDate: " + localDateUpdated + " | ServerDate: " + asset.dateModified + "</color>");
+                if (localDateUpdated >= asset.dateModified)
                 {
-                    localDateUpdated = File.GetLastWriteTime(filepath);
-                    if (debugMode)
-                        Debug.Log("<color=lightblue> <b>DATES</b> LocalDate: " + localDateUpdated +
-                                  " | ServerDate: " + asset.dateModified + "</color>");
-                    if (localDateUpdated >= asset.dateModified)
-                    {
-                        if (debugMode)
-                            Debug.Log("<color=lightblue> Saving Image Reference: " + imageName + "</color>");
-                        _imageNames.Add(imageName);
-                        asset.localPath = filepath;
-                        if (debugMode)
-                            Debug.Log("<Color=#E38B81> -----------------CONTINUE--------------- </color>");
-                        return;
-                    }
+                    if (debugMode) Debug.Log($"<color=lightblue> Saving {fileType} Reference: " + fileName + "</color>");
+                    AddAssetFile(asset,fileType, filepath, fileName);
+                    if (debugMode) Debug.Log("<Color=#E38B81> -----------------CONTINUE--------------- </color>");
+                    return;
                 }
-
-                _imageNames.Add(imageName);
-                asset.localPath = filepath;
-                _imagesToDownload.Add(asset);
-                _imageCount++;
             }
-            else if (CheckIfVideo(asset.extension))
-            {
-                vidName = asset.url.Substring(asset.url.LastIndexOf('/') + 1);
-                var filepath = Path.Combine(_vidDirPath, vidName);
-                if (debugMode)
-                    Debug.Log("<color=lightblue> <b>ASSET</b> VIDEO: " + vidName + " | Path: " + filepath +
-                              "</color>");
 
-                if (File.Exists(filepath))
-                {
-                    localDateUpdated = File.GetLastWriteTime(filepath);
-                    if (debugMode)
-                        Debug.Log("<color=lightblue> <b>DATES</b> LocalDate: " + localDateUpdated +
-                                  " | ServerDate: " + asset.dateModified + "</color>");
-                    if (localDateUpdated >= asset.dateModified)
-                    {
-                        if (debugMode)
-                            Debug.Log("<color=lightblue> Saving Video Reference: " + vidName + "</color>");
-                        _videoNames.Add(vidName);
-                        asset.localPath = filepath;
-                        if (debugMode)
-                            Debug.Log("<Color=#E38B81> -----------------CONTINUE--------------- </color>");
-                        return;
-                    }
-                }
-
-                _videoNames.Add(vidName);
-                asset.localPath = filepath;
-                _videosToDownload.Add(asset);
-                _videoCount++;
-            }
+            AddAssetFile(asset,fileType, filepath, fileName, true);
         }
-        
+
+        //Adds Asset file to List after it has been checked 
+        private void AddAssetFile(AssetBase asset, FileType type, string filepath, string assetName, bool shouldDownload = false)
+        {
+            var assetList = type == FileType.Image ? _imageNames : _videoNames;
+            assetList.Add(assetName);
+            asset.localPath = filepath;
+            
+            if (!shouldDownload) return;
+            var downloadList = type == FileType.Image ? _imagesToDownload : _videosToDownload;
+            downloadList.Add(asset);
+            
+            if(type == FileType.Image) _imageCount++;
+            else _videoCount++;
+        }
+
+        //Returns absolute path of asset file based on type
+        private string GetFilePath(FileType fileType, string fileName)
+        {
+            var filePathBase = fileType == FileType.Image ? _imgDirPath : fileType == FileType.Video ? _vidDirPath : _binDirPath;
+            var filepath = Path.Combine(filePathBase, fileName);
+            if (debugMode) Debug.Log($"<color=lightblue> <b>ASSET</b> {fileType}: " + fileName + " | Path: " + filepath + "</color>");
+            return filepath;
+        }
+
         //Once assets are checked either raise the complete event or queue download
         private void OnAssetsChecked()
         {
@@ -408,7 +408,7 @@ namespace BUT.Downloader
                 {
                     if (debugMode) Debug.Log("<color=purple> <b> VIDEO </b> ServerPath: " + settings.assetURL + vid.url + "</color>");
                     string req = vid.url.Contains("http") ? vid.url : settings.assetURL + vid.url;
-                    downloadTasks.Add(_videoUtil.DownloadVideo(req,_vidDirPath,token,() => {IncrementDownloadedAssetCount(false);}));
+                    downloadTasks.Add(_videoUtil.DownloadVideo(req,vid.localPath,token,() => {IncrementDownloadedAssetCount(false);}));
                 }
             }
 
@@ -450,29 +450,36 @@ namespace BUT.Downloader
         //Co-routine to delete assets on disk but not in json anymore 
         private IEnumerator DeleteUnusedAssets()
         {
-            if (_imageNames.Count > 0)
+            var currentAssets = _imageNames;
+            currentAssets.AddRange(_videoNames);
+
+            string[] savedAssets = { };
+            if(!string.IsNullOrEmpty(_imgDirPath))
+               savedAssets = Directory.GetFiles(_imgDirPath);
+            if(!string.IsNullOrEmpty(_vidDirPath) && _vidDirPath != _imgDirPath) 
+                savedAssets = savedAssets.Concat(Directory.GetFiles(_vidDirPath)) as string[];
+            if(!string.IsNullOrEmpty(_binDirPath) && _binDirPath != _vidDirPath && _binDirPath != _imgDirPath)
+                savedAssets = savedAssets.Concat(Directory.GetFiles(_binDirPath)) as string[];
+
+            if (savedAssets == null) yield break;
+            
+            var savedAssetsDict = new Dictionary<string, string>();
+            for (var i = 0; i < savedAssets.Length; i++)
             {
-                var savedImages = Directory.GetFiles(_imgDirPath);
-                foreach (var file in savedImages)
-                    if (!_imageNames.Contains(Path.GetFileName(file)))
-                    {
-                        if (debugMode) Debug.Log("<color=red> Image to Delete:  </color>" + file);
-                        File.Delete(file);
-                    }
+                savedAssetsDict.Add(Path.GetFileName(savedAssets[i]),savedAssets[i]);
             }
 
-            if (_videoNames.Count > 0)
+            for (var i = 0; i < currentAssets.Count; i++)
             {
-                var savedVideos = Directory.GetFiles(_vidDirPath);
-                foreach (var file in savedVideos)
-                    if (!_videoNames.Contains(Path.GetFileName(file)))
-                    {
-                        if (debugMode) Debug.Log("<color=red> Video to Delete:  </color>" + file);
-                        File.Delete(file);
-                    }
+                if(!savedAssetsDict.ContainsKey(currentAssets[i])) continue;
+                savedAssetsDict.Remove(currentAssets[i]);
             }
 
-            yield break;
+            foreach (var savedAsset in savedAssetsDict)
+            {
+                File.Delete(savedAsset.Value);
+                yield return null;
+            }
         }
 
         #endregion
