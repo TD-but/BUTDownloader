@@ -20,7 +20,7 @@ Go to the package manager and click on "Add package from git URL".
 From there, add this URL:
 
 ```
-  https://github.com/TD-but/BUTDownloader.git
+https://github.com/TD-but/BUTDownloader.git
 ```
     
 ## API Reference
